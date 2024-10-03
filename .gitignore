@@ -1,0 +1,69 @@
+node_modules/
+# npm/yarnがインストールするパッケージ。サイズが大きく、package.jsonから再現可能なため除外。
+
+# ビルド出力
+lib/
+dist/
+build/
+# コンパイルされたコードやバンドルされたファイル。ソースコードから生成可能なため除外。
+
+# ログ
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+# デバッグ情報やエラーログ。個人的な情報を含む可能性があるため除外。
+
+# ランタイムデータ
+pids
+*.pid
+*.seed
+*.pid.lock
+# プロセスIDファイルや一時的に生成されるデータファイル。
+
+# ディレクトリ
+coverage/
+# テストカバレッジレポート。CIで再生成可能なため除外。
+
+# 一時ファイル
+.tmp/
+.temp/
+# 一時的に生成されるファイル。
+
+# 環境設定
+.env
+.env.test
+.env*.local
+# 環境変数ファイル。APIキーなどの機密情報を含む可能性があるため除外。
+
+# IDE/エディタ固有のファイル
+.vscode/
+.idea/
+*.swp
+*.swo
+# 個人の開発環境設定。チーム内で統一する必要がない限り除外。
+
+# OS生成ファイル
+.DS_Store
+Thumbs.db
+# オペレーティングシステムが自動生成するファイル。
+
+# npm/yarn関連
+.npm
+.yarn-integrity
+# npm/yarnの内部ファイル。
+
+# その他
+*.tgz
+# npmパッケージのアーカイブファイル。
+
+# TypeScript
+*.tsbuildinfo
+# TypeScriptのビルド情報ファイル。
+
+# notion-db-js特有の除外項目（必要に応じて追加）
+# 例: テスト用のNotionデータベース設定ファイルなど
+notion-test-config.json
+
+
