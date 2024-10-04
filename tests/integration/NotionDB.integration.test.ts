@@ -7,13 +7,12 @@ import NotionDB from "../../src/index";
 dotenv.config();
 
 const NOTION_API_KEY = process.env.NOTION_API_KEY;
-const TEST_DATABASE_NAME = "blogs"; // テスト用のデータベース名を指定
 
 if (!NOTION_API_KEY) {
   throw new Error("NOTION_API_KEY must be set in .env file");
 }
 
-describe("NotionDB Integration Tests", () => {
+describe("NotionDB Insert Method Integration Tests", () => {
   let notionDB: NotionDB;
 
   beforeAll(async () => {
@@ -22,12 +21,10 @@ describe("NotionDB Integration Tests", () => {
   });
 
   test("NotionDBのblogsテーブルの中に1レコード追加する", async () => {
-    const table = notionDB.from(TEST_DATABASE_NAME);
-
     const testId = uuidv4();
     const testTitle = `Sample Title`;
 
-    const newRecordId = await table.insert({
+    const newRecordId = await notionDB.from("blogs").insert({
       id: testId,
       title: testTitle,
       description: "This is a sample description",
@@ -35,5 +32,20 @@ describe("NotionDB Integration Tests", () => {
 
     expect(newRecordId).toBeTruthy();
     expect(typeof newRecordId).toBe("string");
+  });
+
+  test("存在しないデータベースへのアクセス時にエラーをスローする", async () => {
+    try {
+      await notionDB.from("non_existent_db").insert({
+        title: "Test",
+      });
+      // もしここまで到達したら、エラーがスローされなかったということなのでテストを失敗させる
+      fail("Expected an error to be thrown");
+    } catch (error) {
+      expect(error).toBeInstanceOf(Error);
+      expect((error as Error).message).toMatch(
+        /Database non_existent_db not found/
+      );
+    }
   });
 });

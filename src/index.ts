@@ -1,5 +1,8 @@
 import { APIResponseError, Client } from "@notionhq/client";
-import { CreatePageParameters } from "@notionhq/client/build/src/api-endpoints";
+import {
+  CreatePageParameters,
+  QueryDatabaseParameters,
+} from "@notionhq/client/build/src/api-endpoints";
 
 type PropertyValue = string | number | boolean | Date | string[];
 
@@ -27,10 +30,29 @@ class NotionTable {
       database_id: this.databaseId,
     });
     this.databaseSchema = response.properties;
-    console.log(
-      "Database schema:",
-      JSON.stringify(this.databaseSchema, null, 2)
-    );
+  }
+
+  private convertToDateProperty(value: PropertyValue): { start: string } {
+    let date: Date;
+
+    if (value instanceof Date) {
+      date = value;
+    } else if (typeof value === "string" || typeof value === "number") {
+      const parsedDate = new Date(value);
+      if (!isNaN(parsedDate.getTime())) {
+        date = parsedDate;
+      } else {
+        console.warn(`Invalid date value: ${value}. Using current date.`);
+        date = new Date();
+      }
+    } else {
+      console.warn(
+        `Unsupported date value type: ${typeof value}. Using current date.`
+      );
+      date = new Date();
+    }
+
+    return { start: date.toISOString() };
   }
 
   private convertToNotionFormat(
@@ -49,10 +71,6 @@ class NotionTable {
       }
 
       const propertyType = this.databaseSchema[schemaKey].type;
-      console.log(
-        `Processing property: ${key} (${propertyType}), value:`,
-        value
-      );
 
       switch (propertyType) {
         case "title":
@@ -69,16 +87,11 @@ class NotionTable {
         case "checkbox":
           result[schemaKey] = { checkbox: Boolean(value) };
           break;
-        // case "date":
-        //   result[schemaKey] = {
-        //     date: {
-        //       start: (value instanceof Date
-        //         ? value
-        //         : new Date(value)
-        //       ).toISOString(),
-        //     },
-        //   };
-        //   break;
+        case "date":
+          result[schemaKey] = {
+            date: this.convertToDateProperty(value),
+          };
+          break;
         case "multi_select":
           result[schemaKey] = {
             multi_select: Array.isArray(value)
@@ -107,24 +120,15 @@ class NotionTable {
     try {
       const convertedProperties = this.convertToNotionFormat(properties);
 
-      console.log(
-        "Final check before API call:",
-        JSON.stringify(convertedProperties, null, 2)
-      );
-
       const response = await this.notion.pages.create({
         parent: { type: "database_id", database_id: this.databaseId },
         properties: convertedProperties,
       });
 
-      // no response here
-      console.log("API response:", JSON.stringify(response, null, 2));
       return response.id;
     } catch (error) {
-      console.error("Error inserting record:", error);
       if (error instanceof Error) {
         console.error("Error message:", error.message);
-        console.error("Error stack:", error.stack);
       }
       if (error instanceof APIResponseError) {
         console.error(
@@ -134,6 +138,35 @@ class NotionTable {
           JSON.stringify(error.body, null, 2)
         );
       }
+      throw error;
+    }
+  }
+
+  async select(
+    filter?: QueryDatabaseParameters["filter"],
+    sorts?: QueryDatabaseParameters["sorts"]
+  ): Promise<any[]> {
+    try {
+      let hasMore = true;
+      let startCursor: string | undefined;
+      const results: any[] = [];
+
+      while (hasMore) {
+        const response = await this.notion.databases.query({
+          database_id: this.databaseId,
+          filter: filter,
+          sorts: sorts,
+          start_cursor: startCursor,
+        });
+
+        results.push(...response.results);
+        hasMore = response.has_more;
+        startCursor = response.next_cursor as string | undefined;
+      }
+
+      return results;
+    } catch (error) {
+      console.error("Error in select:", error);
       throw error;
     }
   }
