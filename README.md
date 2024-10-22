@@ -80,7 +80,7 @@ const newRecordId = await db.from("your-database-name").insert({
 Here's a real-world example of using notion-db-js in a Next.js API route:
 
 ```typescript
-// app/api/register/route.ts
+// app/api/notion/db/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import NotionDB from "notion-db-js";
 
@@ -100,11 +100,12 @@ export async function POST(req: NextRequest) {
   try {
     const db = await initializeNotionDB();
 
-    const { title, description, author } = body;
+    const { blogName, domain, email, template } = body;
     await db.from("notion-press-db").insert({
-      title,
-      description,
-      author,
+      blogName,
+      domain,
+      email,
+      template,
     });
 
     return NextResponse.json(
@@ -114,11 +115,15 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error(error);
     return NextResponse.json({
-      message: "Failed to save to NotionDB",
+      message: "NotionDBへの保存に失敗しました。",
     });
   }
 }
 ```
+
+Using this code, you can save data to your Notion database as shown in the image below:
+
+![Notion Blog System Architecture](./assets/notion-press-db-2.png)
 
 ## Architecture Overview
 
