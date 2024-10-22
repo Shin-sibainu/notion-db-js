@@ -1,20 +1,30 @@
 {
   "name": "notion-db-js",
-  "version": "1.0.0",
-  "main": "index.js",
+  "version": "1.0.2",
+  "description": "A Notion database wrapper for easier querying",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc",
     "test": "jest",
     "test:unit": "jest tests/unit",
-    "test:integration": "jest --testPathPattern=integration"
+    "test:integration": "jest --testPathPattern=integration",
+    "prepublishOnly": "npm run build"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "keywords": [
+    "notion",
+    "database",
+    "api"
+  ],
+  "author": "ShinCode",
+  "license": "MIT",
   "dependencies": {
-    "@notionhq/client": "^2.2.15",
-    "D": "^1.0.0"
+    "@notionhq/client": "^2.2.15"
   },
   "devDependencies": {
     "@types/jest": "^29.5.13",

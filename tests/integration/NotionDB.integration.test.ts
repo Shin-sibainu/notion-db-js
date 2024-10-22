@@ -22,17 +22,17 @@ describe("NotionDB insert Method Integration Tests", () => {
     await notionDB.initialize();
   });
 
-  // test("NotionDBのblogsテーブルの中に1レコード追加する", async () => {
-  //   const testTitle = `Sample Title 3`;
+  test("NotionDBのblogsテーブルの中に1レコード追加する", async () => {
+    const testTitle = `Sample Title 3`;
 
-  //   const newRecordId = await notionDB.from("blogs").insert({
-  //     title: testTitle,
-  //     description: "This is a sample description 3",
-  //   });
+    const newRecordId = await notionDB.from("blogs").insert({
+      title: "Sample Title",
+      description: "This is a sample description",
+    });
 
-  //   expect(newRecordId).toBeTruthy();
-  //   expect(typeof newRecordId).toBe("string");
-  // });
+    expect(newRecordId).toBeTruthy();
+    expect(typeof newRecordId).toBe("string");
+  });
 
   test("存在しないデータベースへのアクセス時にエラーをスローする", async () => {
     try {
